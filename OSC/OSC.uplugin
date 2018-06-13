@@ -1,19 +1,19 @@
 {
 	"FileVersion" : 3,
 	
-	"FriendlyName" : "OSC",
+	"FriendlyName" : "SSI",
 	"Version" : 1,
-	"VersionName" : "1.0",
-	"CreatedBy" : "Guillaume Buisson",
-	"CreatedByURL" : "http://guillaume.io",
+	"VersionName" : "0.0",
+	"CreatedBy" : "Stefan Büttner",
+	"CreatedByURL" : "",
 	"Description" : "",
-	"Category" : "OSC",
+	"Category" : "SSI",
 	"EnabledByDefault" : true,
 
 	"Modules" :
 	[
 		{
-			"Name" : "OSC",
+			"Name" : "SSI",
 			"Type" : "Runtime",
 			"LoadingPhase" : "PreDefault",
 			"BlacklistPlatforms" : [ "HTML5" ]
