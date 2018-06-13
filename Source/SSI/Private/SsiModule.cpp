@@ -1,6 +1,5 @@
 #include "SsiPrivatePCH.h"
 #include "SsiSettings.h"
-#include "OscDispatcher.h"
 
 #if SSI_EDITOR_BUILD
 #include "Editor.h"
@@ -22,12 +21,9 @@ public:
         }
 
 #if SSI_EDITOR_BUILD
-        //_mustListen = !GIsEditor;  // must not listen now if IsEditor (listen when PIE), else (Standalone Game) listen now
         FEditorDelegates::BeginPIE.AddRaw(this, &FSsiModule::OnBeginPIE);
         FEditorDelegates::EndPIE.AddRaw(this, &FSsiModule::OnEndPIE);
 #endif
-
-        _dispatcher = UOscDispatcher::Get();
         
         HandleSettingsSaved();
 
@@ -58,84 +54,32 @@ public:
     virtual void ShutdownModule( ) override
     {
         UE_LOG(LogSSI, Display, TEXT("Shutdown"));
-
-        if(_dispatcher.IsValid())
-        {
-            auto settings = GetMutableDefault<USsiSettings>();
-            settings->ClearKeyInputs(*_dispatcher);
-
-            _dispatcher->Stop();
-        }
     }
 
     bool HandleSettingsSaved()
     {
-        if(!_dispatcher.IsValid())
-        {
-            UE_LOG(LogSSI, Warning, TEXT("Cannot update settings"));
-            return false;
-        }
-        
         UE_LOG(LogSSI, Display, TEXT("Update settings"));
 
         auto settings = GetMutableDefault<USsiSettings>();
 
-        // receive settings
-#if SSI_EDITOR_BUILD
-        //if(_mustListen)
-        //{
-        //    Listen(settings);
-        //}
-#else
-        Listen(settings);
-#endif
-
         // send settings
         settings->InitSendTargets();
 
-        // input settings
-        settings->UpdateKeyInputs(*_dispatcher);
-
         return true;
     }
-
-    //void Listen(USSISettings * settings)
-    //{
-    //    FIPv4Address receiveAddress(0);
-    //    uint32_t receivePort;
-    //    if(USSISettings::Parse(settings->ReceiveFrom, &receiveAddress, &receivePort, USSISettings::ParseOption::OptionalAddress))
-    //    {
-    //        _dispatcher->Listen(receiveAddress, receivePort, settings->MulticastLoopback);
-    //    }
-    //    else
-    //    {
-    //        UE_LOG(LogOSC, Error, TEXT("Fail to parse receive address: %s"), *settings->ReceiveFrom);
-    //    }
-    //}
 
 private:
 #if SSI_EDITOR_BUILD
     void OnBeginPIE(bool isSimulating)
     {
-        //_mustListen = true;
-
-        check(_dispatcher.IsValid())
         auto settings = GetMutableDefault<USsiSettings>();
-        //Listen(settings);
     }
 
 	void OnEndPIE(bool isSimulating)
     {
-        //_mustListen = false;
-        _dispatcher->Stop();
     }
-
-    //bool _mustListen;
 #endif
 
-private:
-    
-    TWeakObjectPtr<UOscDispatcher> _dispatcher;
 };
 
 

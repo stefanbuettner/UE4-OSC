@@ -1,7 +1,6 @@
 #include "SsiPrivatePCH.h"
 
 #include "SsiSettings.h"
-#include "OscDispatcher.h"
 
 
 USsiSettings::USsiSettings()
@@ -194,28 +193,6 @@ bool USsiSettings::Parse(const FString & ip_port, FIPv4Address * address, uint32
     *address = addressResult;
     *port = portResult;
     return true;
-}
-
-void USsiSettings::ClearKeyInputs(UOscDispatcher & dispatcher)
-{
-    for(auto & receiver : _keyReceivers)
-    {
-        // Unregister here, not in the OscReceiverInputKey destructor
-        // because it would crash at the application exit.
-        dispatcher.UnregisterReceiver(receiver.get());
-    }
-    _keyReceivers.Reset(0);
-}
-
-void USsiSettings::UpdateKeyInputs(UOscDispatcher & dispatcher)
-{
-    ClearKeyInputs(dispatcher);
-    for(const auto & address : Inputs)
-    {
-        auto receiver = std::make_unique<OscReceiverInputKey>(address);
-        dispatcher.RegisterReceiver(receiver.get());
-        _keyReceivers.Add(std::move(receiver));
-    }
 }
 
 #if WITH_EDITOR
