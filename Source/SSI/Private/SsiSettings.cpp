@@ -1,26 +1,25 @@
-#include "OscPrivatePCH.h"
+#include "SsiPrivatePCH.h"
 
-#include "OscSettings.h"
+#include "SsiSettings.h"
 #include "OscDispatcher.h"
 
 
-UOscSettings::UOscSettings()
- :  ReceiveFrom("8000"),
-    MulticastLoopback(true),
+USsiSettings::USsiSettings()
+ :  MulticastLoopback(true),
     _sendSocket(FUdpSocketBuilder(TEXT("OscSender")).Build())
 {
     SendTargets.Add(TEXT("127.0.0.1:8000"));
 }
 
-UOscSettings::UOscSettings(FVTableHelper & helper)
+USsiSettings::USsiSettings(FVTableHelper & helper)
  :  _sendSocket(FUdpSocketBuilder(TEXT("OscSender")).Build())
 {
     // Does not need to be a valid object.
 }
 
-void UOscSettings::InitSendTargets()
+void USsiSettings::InitSendTargets()
 {
-    UE_LOG(LogOSC, Display, TEXT("Send targets cleared"));
+    UE_LOG(LogSSI, Display, TEXT("Send targets cleared"));
 
     FString addressStr, portStr;
 
@@ -37,7 +36,7 @@ void UOscSettings::InitSendTargets()
     }
 }
 
-int32 UOscSettings::GetOrAddSendTarget(const FString & ip_port)
+int32 USsiSettings::GetOrAddSendTarget(const FString & ip_port)
 {
     const int32 * result = _sendAddressesIndex.Find(ip_port);
     if(result)
@@ -48,7 +47,7 @@ int32 UOscSettings::GetOrAddSendTarget(const FString & ip_port)
     return AddSendTarget(ip_port);
 }
 
-int32 UOscSettings::AddSendTarget(const FString & ip_port)
+int32 USsiSettings::AddSendTarget(const FString & ip_port)
 {
     auto target = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 
@@ -58,11 +57,11 @@ int32 UOscSettings::AddSendTarget(const FString & ip_port)
     {
         target->SetIp(address.Value);
         target->SetPort(port);
-        UE_LOG(LogOSC, Display, TEXT("Send target added: %s"), *ip_port);
+        UE_LOG(LogSSI, Display, TEXT("Send target added: %s"), *ip_port);
     }
     else
     {
-        UE_LOG(LogOSC, Error, TEXT("Fail to parse or invalid send target: %s"), *ip_port);
+        UE_LOG(LogSSI, Error, TEXT("Fail to parse or invalid send target: %s"), *ip_port);
     }
 
     const auto result = _sendAddresses.Num();
@@ -88,7 +87,7 @@ static bool SendImpl(FSocket *socket, const uint8 *buffer, int32 length, const F
     return true;
 }
 
-void UOscSettings::Send(const uint8 *buffer, int32 length, int32 targetIndex)
+void USsiSettings::Send(const uint8 *buffer, int32 length, int32 targetIndex)
 {
     if(targetIndex == -1)
     {
@@ -98,19 +97,19 @@ void UOscSettings::Send(const uint8 *buffer, int32 length, int32 targetIndex)
             if(!SendImpl(&_sendSocket.Get(), buffer, length, *address))
             {
                 const auto target = address->ToString(true);
-                UE_LOG(LogOSC, Error, TEXT("Cannot send OSC: %s : socket cannot send data"), *target);
+                UE_LOG(LogSSI, Error, TEXT("Cannot send OSC: %s : socket cannot send data"), *target);
                 error = true;
             }
         }
 
 #if !NO_LOGGING
         // Log sent packet
-        if(!error && !LogOSC.IsSuppressed(ELogVerbosity::Verbose))
+        if(!error && !LogSSI.IsSuppressed(ELogVerbosity::Verbose))
         {
             TArray<uint8> tmp;
             tmp.Append(buffer, length);
             const auto encoded = FBase64::Encode(tmp);
-            UE_LOG(LogOSC, Verbose, TEXT("SentAll: %s"), *encoded);
+            UE_LOG(LogSSI, Verbose, TEXT("SentAll: %s"), *encoded);
         }
 #endif
     }
@@ -120,29 +119,29 @@ void UOscSettings::Send(const uint8 *buffer, int32 length, int32 targetIndex)
         if(!SendImpl(&_sendSocket.Get(), buffer, length, *_sendAddresses[targetIndex]))
         {
             const auto target = _sendAddresses[targetIndex]->ToString(true);
-            UE_LOG(LogOSC, Error, TEXT("Cannot send OSC: %s : socket cannot send data"), *target);
+            UE_LOG(LogSSI, Error, TEXT("Cannot send OSC: %s : socket cannot send data"), *target);
             error = true;
         }
 
 #if !NO_LOGGING
         // Log sent packet
-        if(!error && !LogOSC.IsSuppressed(ELogVerbosity::Verbose))
+        if(!error && !LogSSI.IsSuppressed(ELogVerbosity::Verbose))
         {
             TArray<uint8> tmp;
             tmp.Append(buffer, length);
             const auto encoded = FBase64::Encode(tmp);
             const auto target  = _sendAddresses[targetIndex]->ToString(true);
-            UE_LOG(LogOSC, Verbose, TEXT("SentTo %s: %s"), *target, *encoded);
+            UE_LOG(LogSSI, Verbose, TEXT("SentTo %s: %s"), *target, *encoded);
         }
 #endif
     }
     else
     {
-        UE_LOG(LogOSC, Error, TEXT("Cannot send OSC: invalid targetIndex %d"), targetIndex);
+        UE_LOG(LogSSI, Error, TEXT("Cannot send OSC: invalid targetIndex %d"), targetIndex);
     }
 }
 
-bool UOscSettings::Parse(const FString & ip_port, FIPv4Address * address, uint32_t * port, ParseOption option)
+bool USsiSettings::Parse(const FString & ip_port, FIPv4Address * address, uint32_t * port, ParseOption option)
 {
     if(ip_port.IsEmpty())
     {
@@ -197,7 +196,7 @@ bool UOscSettings::Parse(const FString & ip_port, FIPv4Address * address, uint32
     return true;
 }
 
-void UOscSettings::ClearKeyInputs(UOscDispatcher & dispatcher)
+void USsiSettings::ClearKeyInputs(UOscDispatcher & dispatcher)
 {
     for(auto & receiver : _keyReceivers)
     {
@@ -208,7 +207,7 @@ void UOscSettings::ClearKeyInputs(UOscDispatcher & dispatcher)
     _keyReceivers.Reset(0);
 }
 
-void UOscSettings::UpdateKeyInputs(UOscDispatcher & dispatcher)
+void USsiSettings::UpdateKeyInputs(UOscDispatcher & dispatcher)
 {
     ClearKeyInputs(dispatcher);
     for(const auto & address : Inputs)
@@ -220,7 +219,7 @@ void UOscSettings::UpdateKeyInputs(UOscDispatcher & dispatcher)
 }
 
 #if WITH_EDITOR
-void UOscSettings::PostEditChangeProperty(FPropertyChangedEvent & PropertyChangedEvent)
+void USsiSettings::PostEditChangeProperty(FPropertyChangedEvent & PropertyChangedEvent)
 {
     static const FName SendTargetsName("SendTargets");
 

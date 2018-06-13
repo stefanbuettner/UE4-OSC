@@ -1,4 +1,4 @@
-#include "OscPrivatePCH.h"
+#include "SsiPrivatePCH.h"
 #include "OscDispatcher.h"
 #include "OscReceiverInterface.h"
 
@@ -54,18 +54,18 @@ void UOscDispatcher::Listen(FIPv4Address address, uint32_t port, bool multicastL
             _socketReceiver->Start();
 
             _listening = std::make_pair(address, port);
-            UE_LOG(LogOSC, Display, TEXT("Listen to port %d"), port);
+            UE_LOG(LogSSI, Display, TEXT("Listen to port %d"), port);
         }
         else
         {
-            UE_LOG(LogOSC, Warning, TEXT("Cannot listen port %d"), port);
+            UE_LOG(LogSSI, Warning, TEXT("Cannot listen port %d"), port);
         }
     }
 }
 
 void UOscDispatcher::Stop()
 {
-    UE_LOG(LogOSC, Display, TEXT("Stop listening"));
+    UE_LOG(LogSSI, Display, TEXT("Stop listening"));
 
     delete _socketReceiver;
     _socketReceiver = nullptr;
@@ -97,7 +97,7 @@ static void SendMessage(TCircularQueue<std::tuple<FName, TArray<FOscDataElemStru
 {
     if(message.State() != osc::SUCCESS)
     {
-        UE_LOG(LogOSC, Warning, TEXT("OSC Received Message Error: %s"), osc::errorString(message.State()));
+        UE_LOG(LogSSI, Warning, TEXT("OSC Received Message Error: %s"), osc::errorString(message.State()));
         return;
     }
     const FName address(message.AddressPattern());
@@ -150,7 +150,7 @@ static void SendMessage(TCircularQueue<std::tuple<FName, TArray<FOscDataElemStru
             }
             else if(error)
             {
-                UE_LOG(LogOSC, Warning, TEXT("OSC Received Message Error: %s"), osc::errorString(error));
+                UE_LOG(LogSSI, Warning, TEXT("OSC Received Message Error: %s"), osc::errorString(error));
             }
             elem.SetBlob(std::move(blob));
         }
@@ -163,7 +163,7 @@ static void SendMessage(TCircularQueue<std::tuple<FName, TArray<FOscDataElemStru
     // the circular buffer may be full.
     if(!added)
     {
-        UE_LOG(LogOSC, Warning, TEXT("Circular Buffer Full: Message Ignored"));
+        UE_LOG(LogSSI, Warning, TEXT("Circular Buffer Full: Message Ignored"));
     }
 }
 
@@ -173,7 +173,7 @@ static void SendBundle(TCircularQueue<std::tuple<FName, TArray<FOscDataElemStruc
 {
     if(bundle.State() != osc::SUCCESS)
     {
-        UE_LOG(LogOSC, Warning, TEXT("OSC Received Bundle Error: %s"), osc::errorString(bundle.State()));
+        UE_LOG(LogSSI, Warning, TEXT("OSC Received Bundle Error: %s"), osc::errorString(bundle.State()));
         return;
     }
 
@@ -197,7 +197,7 @@ void UOscDispatcher::Callback(const FArrayReaderPtr& data, const FIPv4Endpoint& 
     const osc::ReceivedPacket packet((const char *)data->GetData(), data->Num());
     if(packet.State() != osc::SUCCESS)
     {
-        UE_LOG(LogOSC, Warning, TEXT("OSC Received Packet Error: %s"), osc::errorString(packet.State()));
+        UE_LOG(LogSSI, Warning, TEXT("OSC Received Packet Error: %s"), osc::errorString(packet.State()));
         return;
     }
 
@@ -223,10 +223,10 @@ void UOscDispatcher::Callback(const FArrayReaderPtr& data, const FIPv4Endpoint& 
 
 #if !NO_LOGGING
     // Log received packet
-    if(!LogOSC.IsSuppressed(ELogVerbosity::Verbose))
+    if(!LogSSI.IsSuppressed(ELogVerbosity::Verbose))
     {
         const auto encoded = FBase64::Encode(*data);
-        UE_LOG(LogOSC, Verbose, TEXT("Received: %s"), *encoded);
+        UE_LOG(LogSSI, Verbose, TEXT("Received: %s"), *encoded);
     }
 #endif
 }

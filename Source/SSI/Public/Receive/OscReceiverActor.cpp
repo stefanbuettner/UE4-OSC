@@ -1,4 +1,4 @@
-#include "OscPrivatePCH.h"
+#include "SsiPrivatePCH.h"
 #include "OscReceiverActor.h"
 #include "OscDispatcher.h"
 
@@ -11,7 +11,7 @@ AOscReceiverActor::AOscReceiverActor()
     {
         instance->RegisterReceiver(&_listener);
 
-        UE_LOG(LogOSC, Verbose, TEXT("Registering actor %s"), *GetName());
+        UE_LOG(LogSSI, Verbose, TEXT("Registering actor %s"), *GetName());
     }
 }
 
@@ -28,7 +28,7 @@ void AOscReceiverActor::BeginDestroy()
     {
         instance->UnregisterReceiver(&_listener);
 
-        UE_LOG(LogOSC, Verbose, TEXT("Unregistering actor %s"), *GetName());
+        UE_LOG(LogSSI, Verbose, TEXT("Unregistering actor %s"), *GetName());
     }
 
     Super::BeginDestroy();

@@ -14,7 +14,7 @@ class UOscDispatcher : public UObject
 {
     GENERATED_BODY()
 
-    friend class FOscModule;
+    friend class FSsiModule;
 
     void Listen(FIPv4Address address, uint32_t port, bool multicastLoopback);
     void Stop();

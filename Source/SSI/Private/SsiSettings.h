@@ -3,23 +3,23 @@
 #include <utility>
 #include "OscReceiverInputKey.h"
 
-#include "OscSettings.generated.h"
+#include "SsiSettings.generated.h"
 
 class UOscDispatcher;
 
 
 UCLASS(Config=Engine, DefaultConfig)
-class UOscSettings : public UObject
+class USsiSettings : public UObject
 {
     GENERATED_BODY()
 
 public:
 
     /// Default constructor
-    UOscSettings();
+    USsiSettings();
 
     /// Hot reload constructor
-    UOscSettings(FVTableHelper & helper);
+    USsiSettings(FVTableHelper & helper);
 
     /**
      *  Specify the [address:]port to listen to.
@@ -29,8 +29,8 @@ public:
      *  - "224.0.0.100:8000" listen multi-cast messages of group 224.0.0.100 on port 8000.
      *  - "192.168.0.1:8000" listen messages addressed specifically to 192.168.0.1 on port 8000, useful if there are several addresses for this machine.
      */
-    UPROPERTY(Config, EditAnywhere, Category=Receive)
-    FString ReceiveFrom;
+    //UPROPERTY(Config, EditAnywhere, Category=Receive)
+    //FString ReceiveFrom;
 
     /**
      *  Specify the addresses (ip:port) to send messages to.

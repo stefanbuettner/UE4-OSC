@@ -2,7 +2,7 @@
 
 #include "OscDataElemStruct.h"
 #include "OscMessageStruct.h"
-#include "OscFunctionLibrary.generated.h"
+#include "SsiFunctionLibrary.generated.h"
 
 
 UCLASS()
