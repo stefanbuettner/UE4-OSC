@@ -5,7 +5,7 @@
 
 
 USTRUCT(BlueprintType)
-struct OSC_API FOscMessageStruct
+struct SSI_API FOscMessageStruct
 {
     GENERATED_USTRUCT_BODY()
 

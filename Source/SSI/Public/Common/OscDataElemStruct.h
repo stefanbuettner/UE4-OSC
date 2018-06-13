@@ -4,7 +4,7 @@
 
 
 USTRUCT(BlueprintType)
-struct OSC_API FOscDataElemStruct
+struct SSI_API FOscDataElemStruct
 {
     GENERATED_USTRUCT_BODY()
 

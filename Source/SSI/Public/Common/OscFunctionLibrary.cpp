@@ -24,33 +24,33 @@ void PopValueImpl(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemS
     }
 }
 
-void UOscFunctionLibrary::PopBool(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, bool & Value)
+void USsiFunctionLibrary::PopBool(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, bool & Value)
 {
     PopValueImpl(input, output, Value);
 }
 
-void UOscFunctionLibrary::PopFloat(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, float & Value)
+void USsiFunctionLibrary::PopFloat(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, float & Value)
 {
     PopValueImpl(input, output, Value);
 }
 
-void UOscFunctionLibrary::PopInt(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, int32 & Value)
+void USsiFunctionLibrary::PopInt(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, int32 & Value)
 {
     PopValueImpl(input, output, Value);
 }
 
-void UOscFunctionLibrary::PopString(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, FName & Value)
+void USsiFunctionLibrary::PopString(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, FName & Value)
 {
     PopValueImpl(input, output, Value);
 }
 
-void UOscFunctionLibrary::PopBlob(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, TArray<uint8> & Value)
+void USsiFunctionLibrary::PopBlob(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, TArray<uint8> & Value)
 {
     PopValueImpl(input, output, Value);
 }
 
 
-void UOscFunctionLibrary::PushBool(const TArray<FOscDataElemStruct> & input, bool Value, TArray<FOscDataElemStruct> & output)
+void USsiFunctionLibrary::PushBool(const TArray<FOscDataElemStruct> & input, bool Value, TArray<FOscDataElemStruct> & output)
 {
     output = input;
     FOscDataElemStruct elem;
@@ -58,7 +58,7 @@ void UOscFunctionLibrary::PushBool(const TArray<FOscDataElemStruct> & input, boo
     output.Add(elem);
 }
 
-void UOscFunctionLibrary::PushFloat(const TArray<FOscDataElemStruct> & input, float Value, TArray<FOscDataElemStruct> & output)
+void USsiFunctionLibrary::PushFloat(const TArray<FOscDataElemStruct> & input, float Value, TArray<FOscDataElemStruct> & output)
 {
     output = input;
     FOscDataElemStruct elem;
@@ -66,7 +66,7 @@ void UOscFunctionLibrary::PushFloat(const TArray<FOscDataElemStruct> & input, fl
     output.Add(elem);
 }
 
-void UOscFunctionLibrary::PushInt(const TArray<FOscDataElemStruct> & input, int32 Value, TArray<FOscDataElemStruct> & output)
+void USsiFunctionLibrary::PushInt(const TArray<FOscDataElemStruct> & input, int32 Value, TArray<FOscDataElemStruct> & output)
 {
     output = input;
     FOscDataElemStruct elem;
@@ -74,7 +74,7 @@ void UOscFunctionLibrary::PushInt(const TArray<FOscDataElemStruct> & input, int3
     output.Add(elem);
 }
 
-void UOscFunctionLibrary::PushString(const TArray<FOscDataElemStruct> & input, FName Value, TArray<FOscDataElemStruct> & output)
+void USsiFunctionLibrary::PushString(const TArray<FOscDataElemStruct> & input, FName Value, TArray<FOscDataElemStruct> & output)
 {
     if(Value.GetDisplayNameEntry()->IsWide())
     {
@@ -89,7 +89,7 @@ void UOscFunctionLibrary::PushString(const TArray<FOscDataElemStruct> & input, F
     output.Add(elem);
 }
 
-void UOscFunctionLibrary::PushBlob(const TArray<FOscDataElemStruct> & input, const TArray<uint8> & Value, TArray<FOscDataElemStruct> & output)
+void USsiFunctionLibrary::PushBlob(const TArray<FOscDataElemStruct> & input, const TArray<uint8> & Value, TArray<FOscDataElemStruct> & output)
 {
     output = input;
     FOscDataElemStruct elem;
@@ -98,61 +98,61 @@ void UOscFunctionLibrary::PushBlob(const TArray<FOscDataElemStruct> & input, con
 }
 
 
-bool UOscFunctionLibrary::AsBool(const FOscDataElemStruct & input)
+bool USsiFunctionLibrary::AsBool(const FOscDataElemStruct & input)
 {
     return input.GetValue<bool>();
 }
 
-float UOscFunctionLibrary::AsFloat(const FOscDataElemStruct & input)
+float USsiFunctionLibrary::AsFloat(const FOscDataElemStruct & input)
 {
     return input.GetValue<float>();
 }
 
-int32 UOscFunctionLibrary::AsInt(const FOscDataElemStruct & input)
+int32 USsiFunctionLibrary::AsInt(const FOscDataElemStruct & input)
 {
     return input.GetValue<int32>();
 }
 
-FName UOscFunctionLibrary::AsString(const FOscDataElemStruct & input)
+FName USsiFunctionLibrary::AsString(const FOscDataElemStruct & input)
 {
     return input.GetValue<FName>();
 }
 
-TArray<uint8> UOscFunctionLibrary::AsBlob(const FOscDataElemStruct & input)
+TArray<uint8> USsiFunctionLibrary::AsBlob(const FOscDataElemStruct & input)
 {
     return input.GetValue<TArray<uint8>>();
 }
 
 
-FOscDataElemStruct UOscFunctionLibrary::FromBool(bool input)
+FOscDataElemStruct USsiFunctionLibrary::FromBool(bool input)
 {
     FOscDataElemStruct result;
     result.SetBool(input);
     return result;
 }
 
-FOscDataElemStruct UOscFunctionLibrary::FromFloat(float input)
+FOscDataElemStruct USsiFunctionLibrary::FromFloat(float input)
 {
     FOscDataElemStruct result;
     result.SetFloat(input);
     return result;
 }
 
-FOscDataElemStruct UOscFunctionLibrary::FromInt(int32 input)
+FOscDataElemStruct USsiFunctionLibrary::FromInt(int32 input)
 {
     FOscDataElemStruct result;
     result.SetInt(input);
     return result;
 }
 
-FOscDataElemStruct UOscFunctionLibrary::FromString(FName input)
+FOscDataElemStruct USsiFunctionLibrary::FromString(FName input)
 {
     FOscDataElemStruct result;
     result.SetString(input);
     return result;
 }
 
-FOscDataElemStruct UOscFunctionLibrary::FromBlob(const TArray<uint8> & input)
+FOscDataElemStruct USsiFunctionLibrary::FromBlob(const TArray<uint8> & input)
 {
     FOscDataElemStruct result;
     result.SetBlob(input);
@@ -230,7 +230,7 @@ namespace
     TArray<uint8> GlobalBuffer(TArray<uint8>(), 1024);
 }
 
-void UOscFunctionLibrary::SendOsc(FName Address, const TArray<FOscDataElemStruct> & Data, int32 TargetIndex)
+void USsiFunctionLibrary::SendOsc(FName Address, const TArray<FOscDataElemStruct> & Data, int32 TargetIndex)
 {
     if(!isValidAddress(Address))
     {
@@ -261,7 +261,7 @@ void UOscFunctionLibrary::SendOsc(FName Address, const TArray<FOscDataElemStruct
     }
 }
 
-void UOscFunctionLibrary::SendOscBundle(const TArray<FOscMessageStruct> & Messages, int32 TargetIndex)
+void USsiFunctionLibrary::SendOscBundle(const TArray<FOscMessageStruct> & Messages, int32 TargetIndex)
 {
     static_assert(sizeof(uint8) == sizeof(char), "Cannot cast uint8 to char");
 
@@ -309,7 +309,7 @@ void UOscFunctionLibrary::SendOscBundle(const TArray<FOscMessageStruct> & Messag
     }
 }
 
-int32 UOscFunctionLibrary::AddSendOscTarget(FString IpPort)
+int32 USsiFunctionLibrary::AddSendOscTarget(FString IpPort)
 {
     return GetMutableDefault<UOscSettings>()->GetOrAddSendTarget(IpPort);
 }

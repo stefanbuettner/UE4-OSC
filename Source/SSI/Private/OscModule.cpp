@@ -2,7 +2,7 @@
 #include "OscSettings.h"
 #include "OscDispatcher.h"
 
-#if OSC_EDITOR_BUILD
+#if SSI_EDITOR_BUILD
 #include "Editor.h"
 #endif
 
@@ -21,7 +21,7 @@ public:
             return;
         }
 
-#if OSC_EDITOR_BUILD
+#if SSI_EDITOR_BUILD
         _mustListen = !GIsEditor;  // must not listen now if IsEditor (listen when PIE), else (Standalone Game) listen now
         FEditorDelegates::BeginPIE.AddRaw(this, &FOscModule::OnBeginPIE);
         FEditorDelegates::EndPIE.AddRaw(this, &FOscModule::OnEndPIE);
@@ -48,7 +48,7 @@ public:
         }
         else
         {
-#if OSC_EDITOR_BUILD
+#if SSI_EDITOR_BUILD
             UE_LOG(LogOSC, Warning, TEXT("Settings changed registration failed"));
 #endif
         }
@@ -81,7 +81,7 @@ public:
         auto settings = GetMutableDefault<UOscSettings>();
 
         // receive settings
-#if OSC_EDITOR_BUILD
+#if SSI_EDITOR_BUILD
         if(_mustListen)
         {
             Listen(settings);
@@ -114,7 +114,7 @@ public:
     }
 
 private:
-#if OSC_EDITOR_BUILD
+#if SSI_EDITOR_BUILD
     void OnBeginPIE(bool isSimulating)
     {
         _mustListen = true;

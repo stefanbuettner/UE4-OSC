@@ -1,8 +1,8 @@
 namespace UnrealBuildTool.Rules
 {
-	public class OSC : ModuleRules
+	public class SSI : ModuleRules
 	{
-		public OSC(ReadOnlyTargetRules Target) : base(Target)
+		public SSI(ReadOnlyTargetRules Target) : base(Target)
         {
 			PublicDependencyModuleNames.AddRange(
 				new string[]
@@ -31,31 +31,31 @@ namespace UnrealBuildTool.Rules
 
             PublicIncludePaths.AddRange(
 				new string[] {
-					"OSC/Public",
-					"OSC/Public/Common",
-					"OSC/Public/Receive",
-					"OSC/Public/Send",
+					"SSI/Public",
+					"SSI/Public/Common",
+					"SSI/Public/Receive",
+					"SSI/Public/Send",
 				}
             );
 
 			PrivateIncludePaths.AddRange(
 				new string[] {
-					"OSC/Private",
-					"OSC/Private/Common",
-					"OSC/Private/Receive",
-					"OSC/Private/Send",
+					"SSI/Private",
+					"SSI/Private/Common",
+					"SSI/Private/Receive",
+					"SSI/Private/Send",
 				}
 			);
 
             if (Target.Type == TargetRules.TargetType.Editor)
             {
-                Definitions.Add("OSC_EDITOR_BUILD=1");
+                Definitions.Add("SSI_EDITOR_BUILD=1");
 
                 PrivateDependencyModuleNames.Add("UnrealEd");
             }
             else
             {
-                Definitions.Add("OSC_EDITOR_BUILD=0");
+                Definitions.Add("SSI_EDITOR_BUILD=0");
             }
         }
 	}

@@ -6,93 +6,93 @@
 
 
 UCLASS()
-class OSC_API UOscFunctionLibrary : public UBlueprintFunctionLibrary
+class SSI_API USsiFunctionLibrary : public UBlueprintFunctionLibrary
 {
     GENERATED_BODY()
 
 public:
 
     /// Get the next value from an OSC message as a boolean.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static void PopBool(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, bool & Value);
 
     /// Get the next value from an OSC message as a floating point.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static void PopFloat(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, float & Value);
 
     /// Get the next value from an OSC message as a integer.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static void PopInt(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, int32 & Value);
 
     /// Get the next value from an OSC message as a string.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static void PopString(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, FName & Value);
 
     /// Get the next value from an OSC message as a blob.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static void PopBlob(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, TArray<uint8> & Value);
 
 
     /// Add a boolean value to an OSC message.
-    UFUNCTION(BlueprintPure, Category=OSC, meta=(AutoCreateRefTerm = "input"))
+    UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
     static void PushBool(const TArray<FOscDataElemStruct> & input, bool Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a floating point value to an OSC message.
-    UFUNCTION(BlueprintPure, Category=OSC, meta=(AutoCreateRefTerm = "input"))
+    UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
     static void PushFloat(const TArray<FOscDataElemStruct> & input, float Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a integer value to an OSC message.
-    UFUNCTION(BlueprintPure, Category=OSC, meta=(AutoCreateRefTerm = "input"))
+    UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
     static void PushInt(const TArray<FOscDataElemStruct> & input, int32 Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a string value to an OSC message.
-    UFUNCTION(BlueprintPure, Category=OSC, meta=(AutoCreateRefTerm = "input"))
+    UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
     static void PushString(const TArray<FOscDataElemStruct> & input, FName Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a blob to an OSC message.
-    UFUNCTION(BlueprintPure, Category=OSC, meta=(AutoCreateRefTerm = "input"))
+    UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
     static void PushBlob(const TArray<FOscDataElemStruct> & input, const TArray<uint8> & Value, TArray<FOscDataElemStruct> & output);
 
 
     /// Interpret an OSC argument as a boolean
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static bool AsBool(const FOscDataElemStruct & input);
 
     /// Interpret an OSC argument as a floating point.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static float AsFloat(const FOscDataElemStruct & input);
 
     /// Interpret an OSC argument as a integer.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static int32 AsInt(const FOscDataElemStruct & input);
 
     /// Interpret an OSC argument as a string.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static FName AsString(const FOscDataElemStruct & input);
 
     /// Interpret an OSC argument as a blob.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static TArray<uint8> AsBlob(const FOscDataElemStruct & input);
 
 
     /// Create an OSC argument from a boolean
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static FOscDataElemStruct FromBool(bool input);
 
     /// Create an OSC argument from a floating point.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static FOscDataElemStruct FromFloat(float input);
 
     /// Create an OSC argument from a integer.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static FOscDataElemStruct FromInt(int32 input);
 
     /// Create an OSC argument from a string.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static FOscDataElemStruct FromString(FName input);
 
     /// Create an OSC argument from a blob.
-    UFUNCTION(BlueprintPure, Category=OSC)
+    UFUNCTION(BlueprintPure, Category=SSI)
     static FOscDataElemStruct FromBlob(const TArray<uint8> & input);
 
 
@@ -102,7 +102,7 @@ public:
      *  @param Data result of successive PushFloat/Int/String/etc.
      *  @param TargetIndex index of the destination, -1 for all destinations. (SendTarget list of the plugin settings)
      */
-    UFUNCTION(BlueprintCallable, Category=OSC, meta=(AutoCreateRefTerm = "Data"))
+    UFUNCTION(BlueprintCallable, Category=SSI, meta=(AutoCreateRefTerm = "Data"))
     static void SendOsc(FName Address, const TArray<FOscDataElemStruct> & Data, int32 TargetIndex);
 
     /**
@@ -110,7 +110,7 @@ public:
     *  @param Messages of the bundle.
     *  @param TargetIndex index of the destination, -1 for all destinations. (SendTarget list of the plugin settings)
     */
-    UFUNCTION(BlueprintCallable, Category=OSC)
+    UFUNCTION(BlueprintCallable, Category=SSI)
     static void SendOscBundle(const TArray<FOscMessageStruct> & Messages, int32 TargetIndex);
 
     /**
@@ -123,6 +123,6 @@ public:
      *
      *  @see SendOsc
      */
-    UFUNCTION(BlueprintCallable, Category=OSC)
+    UFUNCTION(BlueprintCallable, Category=SSI)
     static int32 AddSendOscTarget(FString IpPort = "127.0.0.1:8000");
 };

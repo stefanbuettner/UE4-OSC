@@ -6,8 +6,8 @@
 #include "OscReceiverActor.generated.h"
 
 
-UCLASS(ClassGroup=OSC)
-class OSC_API AOscReceiverActor : public AActor
+UCLASS(ClassGroup=SSI)
+class SSI_API AOscReceiverActor : public AActor
 {
     GENERATED_BODY()
 
