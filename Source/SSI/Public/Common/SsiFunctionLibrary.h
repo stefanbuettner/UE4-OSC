@@ -12,27 +12,6 @@ class SSI_API USsiFunctionLibrary : public UBlueprintFunctionLibrary
 
 public:
 
-    /// Get the next value from an OSC message as a boolean.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static void PopBool(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, bool & Value);
-
-    /// Get the next value from an OSC message as a floating point.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static void PopFloat(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, float & Value);
-
-    /// Get the next value from an OSC message as a integer.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static void PopInt(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, int32 & Value);
-
-    /// Get the next value from an OSC message as a string.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static void PopString(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, FName & Value);
-
-    /// Get the next value from an OSC message as a blob.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static void PopBlob(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, TArray<uint8> & Value);
-
-
     /// Add a boolean value to an OSC message.
     UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
     static void PushBool(const TArray<FOscDataElemStruct> & input, bool Value, TArray<FOscDataElemStruct> & output);
@@ -52,49 +31,6 @@ public:
     /// Add a blob to an OSC message.
     UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
     static void PushBlob(const TArray<FOscDataElemStruct> & input, const TArray<uint8> & Value, TArray<FOscDataElemStruct> & output);
-
-
-    /// Interpret an OSC argument as a boolean
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static bool AsBool(const FOscDataElemStruct & input);
-
-    /// Interpret an OSC argument as a floating point.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static float AsFloat(const FOscDataElemStruct & input);
-
-    /// Interpret an OSC argument as a integer.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static int32 AsInt(const FOscDataElemStruct & input);
-
-    /// Interpret an OSC argument as a string.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static FName AsString(const FOscDataElemStruct & input);
-
-    /// Interpret an OSC argument as a blob.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static TArray<uint8> AsBlob(const FOscDataElemStruct & input);
-
-
-    /// Create an OSC argument from a boolean
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static FOscDataElemStruct FromBool(bool input);
-
-    /// Create an OSC argument from a floating point.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static FOscDataElemStruct FromFloat(float input);
-
-    /// Create an OSC argument from a integer.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static FOscDataElemStruct FromInt(int32 input);
-
-    /// Create an OSC argument from a string.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static FOscDataElemStruct FromString(FName input);
-
-    /// Create an OSC argument from a blob.
-    UFUNCTION(BlueprintPure, Category=SSI)
-    static FOscDataElemStruct FromBlob(const TArray<uint8> & input);
-
 
     /**
      *  @brief Send an OSC message.

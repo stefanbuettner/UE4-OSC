@@ -3,53 +3,6 @@
 #include "SsiFunctionLibrary.h"
 #include "oscpack/osc/OscOutboundPacketStream.h"
 
-
-template <class T>
-static inline
-void PopValueImpl(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, T & Value)
-{
-    if(input.Num() > 0)
-    {
-        output.Reserve(input.Num() - 1);
-        for(int32 i=1, n=input.Num(); i!=n; ++i)
-        {
-            output.Add(input[i]);
-        }
-        Value = input[0].GetValue<T>();
-    }
-    else
-    {
-        output.Empty();
-        Value = FOscDataElemStruct().GetValue<T>();
-    }
-}
-
-void USsiFunctionLibrary::PopBool(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, bool & Value)
-{
-    PopValueImpl(input, output, Value);
-}
-
-void USsiFunctionLibrary::PopFloat(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, float & Value)
-{
-    PopValueImpl(input, output, Value);
-}
-
-void USsiFunctionLibrary::PopInt(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, int32 & Value)
-{
-    PopValueImpl(input, output, Value);
-}
-
-void USsiFunctionLibrary::PopString(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, FName & Value)
-{
-    PopValueImpl(input, output, Value);
-}
-
-void USsiFunctionLibrary::PopBlob(const TArray<FOscDataElemStruct> & input, TArray<FOscDataElemStruct> & output, TArray<uint8> & Value)
-{
-    PopValueImpl(input, output, Value);
-}
-
-
 void USsiFunctionLibrary::PushBool(const TArray<FOscDataElemStruct> & input, bool Value, TArray<FOscDataElemStruct> & output)
 {
     output = input;
@@ -96,69 +49,6 @@ void USsiFunctionLibrary::PushBlob(const TArray<FOscDataElemStruct> & input, con
     elem.SetBlob(Value);
     output.Add(elem);
 }
-
-
-bool USsiFunctionLibrary::AsBool(const FOscDataElemStruct & input)
-{
-    return input.GetValue<bool>();
-}
-
-float USsiFunctionLibrary::AsFloat(const FOscDataElemStruct & input)
-{
-    return input.GetValue<float>();
-}
-
-int32 USsiFunctionLibrary::AsInt(const FOscDataElemStruct & input)
-{
-    return input.GetValue<int32>();
-}
-
-FName USsiFunctionLibrary::AsString(const FOscDataElemStruct & input)
-{
-    return input.GetValue<FName>();
-}
-
-TArray<uint8> USsiFunctionLibrary::AsBlob(const FOscDataElemStruct & input)
-{
-    return input.GetValue<TArray<uint8>>();
-}
-
-
-FOscDataElemStruct USsiFunctionLibrary::FromBool(bool input)
-{
-    FOscDataElemStruct result;
-    result.SetBool(input);
-    return result;
-}
-
-FOscDataElemStruct USsiFunctionLibrary::FromFloat(float input)
-{
-    FOscDataElemStruct result;
-    result.SetFloat(input);
-    return result;
-}
-
-FOscDataElemStruct USsiFunctionLibrary::FromInt(int32 input)
-{
-    FOscDataElemStruct result;
-    result.SetInt(input);
-    return result;
-}
-
-FOscDataElemStruct USsiFunctionLibrary::FromString(FName input)
-{
-    FOscDataElemStruct result;
-    result.SetString(input);
-    return result;
-}
-
-FOscDataElemStruct USsiFunctionLibrary::FromBlob(const TArray<uint8> & input)
-{
-    FOscDataElemStruct result;
-    result.SetBlob(input);
-    return result;
-}
-
 
 namespace
 {
