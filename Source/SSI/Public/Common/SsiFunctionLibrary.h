@@ -13,40 +13,40 @@ class SSI_API USsiFunctionLibrary : public UBlueprintFunctionLibrary
 public:
 
     /// Add a boolean value to an OSC message.
-    UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
+    UFUNCTION(BlueprintPure, Category="SSI|Data Assembly", meta=(AutoCreateRefTerm = "input"))
     static void PushBool(const TArray<FOscDataElemStruct> & input, bool Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a floating point value to an OSC message.
-    UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
+    UFUNCTION(BlueprintPure, Category="SSI|Data Assembly", meta=(AutoCreateRefTerm = "input"))
     static void PushFloat(const TArray<FOscDataElemStruct> & input, float Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a integer value to an OSC message.
-    UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
+    UFUNCTION(BlueprintPure, Category="SSI|Data Assembly", meta=(AutoCreateRefTerm = "input"))
     static void PushInt(const TArray<FOscDataElemStruct> & input, int32 Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a string value to an OSC message.
-    UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
+    UFUNCTION(BlueprintPure, Category="SSI|Data Assembly", meta=(AutoCreateRefTerm = "input"))
     static void PushString(const TArray<FOscDataElemStruct> & input, FName Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a blob to an OSC message.
-    UFUNCTION(BlueprintPure, Category=SSI, meta=(AutoCreateRefTerm = "input"))
+    UFUNCTION(BlueprintPure, Category="SSI|Data Assembly", meta=(AutoCreateRefTerm = "input"))
     static void PushBlob(const TArray<FOscDataElemStruct> & input, const TArray<uint8> & Value, TArray<FOscDataElemStruct> & output);
 
     /**
-     *  @brief Send an OSC message.
+     *  @brief Send an SSI event.
      *  @param Address OSC address.
      *  @param Data result of successive PushFloat/Int/String/etc.
      *  @param TargetIndex index of the destination, -1 for all destinations. (SendTarget list of the plugin settings)
      */
-    UFUNCTION(BlueprintCallable, Category=SSI, meta=(AutoCreateRefTerm = "Data"))
-    static void SendOsc(FName Address, const TArray<FOscDataElemStruct> & Data, int32 TargetIndex);
+    UFUNCTION(BlueprintCallable, Category="SSI", meta=(AutoCreateRefTerm = "Data"))
+    static void SendEvent(const TArray<FOscDataElemStruct> & Data, int32 TargetIndex);
 
     /**
     *  @brief Send several OSC messages in an OSC bundle.
     *  @param Messages of the bundle.
     *  @param TargetIndex index of the destination, -1 for all destinations. (SendTarget list of the plugin settings)
     */
-    UFUNCTION(BlueprintCallable, Category=SSI)
+    UFUNCTION(BlueprintCallable, Category="SSI")
     static void SendOscBundle(const TArray<FOscMessageStruct> & Messages, int32 TargetIndex);
 
     /**
@@ -59,6 +59,6 @@ public:
      *
      *  @see SendOsc
      */
-    UFUNCTION(BlueprintCallable, Category=SSI)
+    UFUNCTION(BlueprintCallable, Category="SSI")
     static int32 AddSendOscTarget(FString IpPort = "127.0.0.1:8000");
 };

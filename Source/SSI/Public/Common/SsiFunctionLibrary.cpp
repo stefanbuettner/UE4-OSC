@@ -120,24 +120,35 @@ namespace
     TArray<uint8> GlobalBuffer(TArray<uint8>(), 1024);
 }
 
-void USsiFunctionLibrary::SendOsc(FName Address, const TArray<FOscDataElemStruct> & Data, int32 TargetIndex)
+void USsiFunctionLibrary::SendEvent(const TArray<FOscDataElemStruct> & Data, int32 TargetIndex)
 {
-    if(!isValidAddress(Address))
-    {
-        return;
-    }
-
     static_assert(sizeof(uint8) == sizeof(char), "Cannot cast uint8 to char");
 
     osc::OutboundPacketStream output((char *)GlobalBuffer.GetData(), GlobalBuffer.Max());
     check(reinterpret_cast<const void *>(GlobalBuffer.GetData()) == reinterpret_cast<const void *>(output.Data()));
 
-    appendMessage(output, Address, Data);
+	output << osc::BeginMessage("/evnt");
+	output << "Sender ID";
+	output << "Event ID";
+	output << -1; // timestamp
+	output << 0; // duration
+	output << 0; // state
+	output << 1; // n_events (string/float pairs)
+
+	output << "Key";
+	output << 3.14159f;
+
+	output << osc::EndMessage;
+
+	if (output.State() != osc::SUCCESS)
+	{
+		return;
+	}
 
     if(output.State() == osc::OUT_OF_BUFFER_MEMORY_ERROR)
     {
         GlobalBuffer.Reserve(GlobalBuffer.Max() * 2);  // not enough memory: double the size
-        SendOsc(Address, Data, TargetIndex);  // try again
+        SendEvent(Data, TargetIndex);  // try again
         return;
     }
 
