@@ -3,7 +3,7 @@
 #include "SsiFunctionLibrary.h"
 #include "oscpack/osc/OscOutboundPacketStream.h"
 
-void USsiFunctionLibrary::PushBool(const TArray<FOscDataElemStruct> & input, bool Value, TArray<FOscDataElemStruct> & output)
+void USsiFunctionLibrary::StreamPushBool(const TArray<FOscDataElemStruct> & input, bool Value, TArray<FOscDataElemStruct> & output)
 {
     output = input;
     FOscDataElemStruct elem;
@@ -11,7 +11,7 @@ void USsiFunctionLibrary::PushBool(const TArray<FOscDataElemStruct> & input, boo
     output.Add(elem);
 }
 
-void USsiFunctionLibrary::PushFloat(const TArray<FOscDataElemStruct> & input, float Value, TArray<FOscDataElemStruct> & output)
+void USsiFunctionLibrary::StreamPushFloat(const TArray<FOscDataElemStruct> & input, float Value, TArray<FOscDataElemStruct> & output)
 {
     output = input;
     FOscDataElemStruct elem;
@@ -19,7 +19,7 @@ void USsiFunctionLibrary::PushFloat(const TArray<FOscDataElemStruct> & input, fl
     output.Add(elem);
 }
 
-void USsiFunctionLibrary::PushInt(const TArray<FOscDataElemStruct> & input, int32 Value, TArray<FOscDataElemStruct> & output)
+void USsiFunctionLibrary::StreamPushInt(const TArray<FOscDataElemStruct> & input, int32 Value, TArray<FOscDataElemStruct> & output)
 {
     output = input;
     FOscDataElemStruct elem;
@@ -27,7 +27,7 @@ void USsiFunctionLibrary::PushInt(const TArray<FOscDataElemStruct> & input, int3
     output.Add(elem);
 }
 
-void USsiFunctionLibrary::PushString(const TArray<FOscDataElemStruct> & input, FName Value, TArray<FOscDataElemStruct> & output)
+void USsiFunctionLibrary::StreamPushString(const TArray<FOscDataElemStruct> & input, FName Value, TArray<FOscDataElemStruct> & output)
 {
     if(Value.GetDisplayNameEntry()->IsWide())
     {
@@ -42,12 +42,18 @@ void USsiFunctionLibrary::PushString(const TArray<FOscDataElemStruct> & input, F
     output.Add(elem);
 }
 
-void USsiFunctionLibrary::PushBlob(const TArray<FOscDataElemStruct> & input, const TArray<uint8> & Value, TArray<FOscDataElemStruct> & output)
+void USsiFunctionLibrary::StreamPushBlob(const TArray<FOscDataElemStruct> & input, const TArray<uint8> & Value, TArray<FOscDataElemStruct> & output)
 {
     output = input;
     FOscDataElemStruct elem;
     elem.SetBlob(Value);
     output.Add(elem);
+}
+
+void USsiFunctionLibrary::EventPushFloat(const TArray<FOscDataElemStruct> & input, FName Key, float Value, TArray<FOscDataElemStruct> & output)
+{
+	StreamPushString(input, Key, output);
+	StreamPushFloat(output, Value, output);
 }
 
 namespace
@@ -120,23 +126,47 @@ namespace
     TArray<uint8> GlobalBuffer(TArray<uint8>(), 1024);
 }
 
-void USsiFunctionLibrary::SendEvent(const TArray<FOscDataElemStruct> & Data, int32 TargetIndex)
+void USsiFunctionLibrary::SendEvent(const FString sender_name, const FString event_name, const TArray<FOscDataElemStruct> & Data, int32 TargetIndex, int32 timestamp, int32 duration, int32 state)
 {
     static_assert(sizeof(uint8) == sizeof(char), "Cannot cast uint8 to char");
+
+	if (Data.Num() % 2 != 0)
+	{
+		UE_LOG(LogSSI, Error, TEXT("Data is expected to contain Key/Value pairs but contains an uneven number (\"%d\") of elements."), Data.Num());
+		return;
+	}
+
+	osc::int32 const n_events = Data.Num() / 2;
 
     osc::OutboundPacketStream output((char *)GlobalBuffer.GetData(), GlobalBuffer.Max());
     check(reinterpret_cast<const void *>(GlobalBuffer.GetData()) == reinterpret_cast<const void *>(output.Data()));
 
 	output << osc::BeginMessage("/evnt");
-	output << "Sender ID";
-	output << "Event ID";
-	output << -1; // timestamp
-	output << 0; // duration
-	output << 0; // state
-	output << 1; // n_events (string/float pairs)
+	output << TCHAR_TO_ANSI(*sender_name);
+	output << TCHAR_TO_ANSI(*event_name);
+	output << timestamp;
+	output << duration;
+	output << state;
+	output << n_events; // number of string/float pairs.
 
-	output << "Key";
-	output << 3.14159f;
+	for (int i = 0; i < Data.Num();)
+	{
+		FOscDataElemStruct const& key = Data[i++];
+		if (!key.IsString())
+		{
+			UE_LOG(LogSSI, Error, TEXT("Keys of Data are expected to be strings but \"%d\"-th element wasn't."), i);
+			return;
+		}
+		output << key.AsStringValue().GetPlainANSIString();
+
+		FOscDataElemStruct const& value = Data[i++];
+		if (!value.IsFloat())
+		{
+			UE_LOG(LogSSI, Error, TEXT("Values of Data are expected to be floats but \"%d\"-th element wasn't."), i);
+			return;
+		}
+		output << (float)value.AsFloatValue();
+	}
 
 	output << osc::EndMessage;
 
@@ -148,7 +178,7 @@ void USsiFunctionLibrary::SendEvent(const TArray<FOscDataElemStruct> & Data, int
     if(output.State() == osc::OUT_OF_BUFFER_MEMORY_ERROR)
     {
         GlobalBuffer.Reserve(GlobalBuffer.Max() * 2);  // not enough memory: double the size
-        SendEvent(Data, TargetIndex);  // try again
+        SendEvent(sender_name, event_name, Data, TargetIndex);  // try again
         return;
     }
 

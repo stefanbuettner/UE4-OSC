@@ -13,24 +13,27 @@ class SSI_API USsiFunctionLibrary : public UBlueprintFunctionLibrary
 public:
 
     /// Add a boolean value to an OSC message.
-    UFUNCTION(BlueprintPure, Category="SSI|Data Assembly", meta=(AutoCreateRefTerm = "input"))
-    static void PushBool(const TArray<FOscDataElemStruct> & input, bool Value, TArray<FOscDataElemStruct> & output);
+    UFUNCTION(BlueprintPure, Category="SSI|Streams", meta=(AutoCreateRefTerm = "input"))
+    static void StreamPushBool(const TArray<FOscDataElemStruct> & input, bool Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a floating point value to an OSC message.
-    UFUNCTION(BlueprintPure, Category="SSI|Data Assembly", meta=(AutoCreateRefTerm = "input"))
-    static void PushFloat(const TArray<FOscDataElemStruct> & input, float Value, TArray<FOscDataElemStruct> & output);
+    UFUNCTION(BlueprintPure, Category="SSI|Streams", meta=(AutoCreateRefTerm = "input"))
+    static void StreamPushFloat(const TArray<FOscDataElemStruct> & input, float Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a integer value to an OSC message.
-    UFUNCTION(BlueprintPure, Category="SSI|Data Assembly", meta=(AutoCreateRefTerm = "input"))
-    static void PushInt(const TArray<FOscDataElemStruct> & input, int32 Value, TArray<FOscDataElemStruct> & output);
+    UFUNCTION(BlueprintPure, Category="SSI|Streams", meta=(AutoCreateRefTerm = "input"))
+    static void StreamPushInt(const TArray<FOscDataElemStruct> & input, int32 Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a string value to an OSC message.
-    UFUNCTION(BlueprintPure, Category="SSI|Data Assembly", meta=(AutoCreateRefTerm = "input"))
-    static void PushString(const TArray<FOscDataElemStruct> & input, FName Value, TArray<FOscDataElemStruct> & output);
+    UFUNCTION(BlueprintPure, Category="SSI|Streams", meta=(AutoCreateRefTerm = "input"))
+    static void StreamPushString(const TArray<FOscDataElemStruct> & input, FName Value, TArray<FOscDataElemStruct> & output);
 
     /// Add a blob to an OSC message.
-    UFUNCTION(BlueprintPure, Category="SSI|Data Assembly", meta=(AutoCreateRefTerm = "input"))
-    static void PushBlob(const TArray<FOscDataElemStruct> & input, const TArray<uint8> & Value, TArray<FOscDataElemStruct> & output);
+    UFUNCTION(BlueprintPure, Category="SSI|Streams", meta=(AutoCreateRefTerm = "input"))
+    static void StreamPushBlob(const TArray<FOscDataElemStruct> & input, const TArray<uint8> & Value, TArray<FOscDataElemStruct> & output);
+
+	UFUNCTION(BlueprintPure, Category="SSI|Events", meta=(AutoCreateRefTerm = "input"))
+	static void EventPushFloat(const TArray<FOscDataElemStruct> & input, FName Key, float Value, TArray<FOscDataElemStruct> & output);
 
     /**
      *  @brief Send an SSI event.
@@ -39,7 +42,7 @@ public:
      *  @param TargetIndex index of the destination, -1 for all destinations. (SendTarget list of the plugin settings)
      */
     UFUNCTION(BlueprintCallable, Category="SSI", meta=(AutoCreateRefTerm = "Data"))
-    static void SendEvent(const TArray<FOscDataElemStruct> & Data, int32 TargetIndex);
+    static void SendEvent(const FString sender_name, const FString event_name, const TArray<FOscDataElemStruct> & Data, int32 TargetIndex, int32 timestamp = -1, int32 duration = 0, int32 state = 0);
 
     /**
     *  @brief Send several OSC messages in an OSC bundle.
