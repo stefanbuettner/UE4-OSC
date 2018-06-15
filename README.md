@@ -1,23 +1,9 @@
-UE4-OSC
+UE4-SSI
 =======
 
-OSC plugin for Unreal Engine 4 to send and receive OSC messages with blueprints!
+SSI plugin for Unreal Engine 4 to send and receive SSI events and streams with blueprints!
 
 It uses oscpack, a C++ library for packing/unpacking OSC messages, by Ross Bencina. http://www.rossbencina.com/code/oscpack
-
-
-# Tutorial
-
-Dannington made a super tutorial!
-
-Watch it to properly install the plugin and get some brilliant ideas on how to use it!
-
-https://www.youtube.com/watch?v=GGGs-n-CKtY
-
-
-Also, go to the UE4 forum dedicated thread:
-
-https://forums.unrealengine.com/showthread.php?49627-Plugin-OSC-for-UE4
 
 
 # Integration
@@ -26,8 +12,8 @@ Install Visual Studio 2015 on Windows (Community edition works) or XCode on MaxO
 
 Create a "C++" project, or convert a "Blueprint" project to "C++".
 
-Create a "Plugins" directory in the project root (near the "Content" directory) and put the "OSC" folder of the plugin in it.
-(e.g. "/MyProject/Plugins/OSC")
+Create a "Plugins" directory in the project root (near the "Content" directory) and put the "SSI" folder of the plugin in it.
+(e.g. "/MyProject/Plugins/SSI")
 
 Run the "*.uproject" file: the plugin is compiled automatically.
 
@@ -36,9 +22,9 @@ Alternatively, right-clic the "*.uproject" to generate Visual Studio or XCode pr
 
 # Usage
 
-### Receiver
+## Receiver
 
-Set the listening port as "Receive From" in the plugin settings. (Edit/Project Settings/Plugins/OSC)
+Set the listening port as "Receive From" in the plugin settings. (Edit/Project Settings/Plugins/SSI)
 
 Add a OscReceiverComponent to your Blueprint class and bind the OnOscReceived custom event, or
 subclass the OscReceiverActor and bind the OnOscReceived custom event.
@@ -49,7 +35,7 @@ The OSC parameters is an array of OSC elements. To read the content, either:
  - chain PopFloat/Int/Bool/String/Blob functions to get the first value, or
  - use the standard GET function and AsFloat/Int/Bool/String/Blob functions to cast the element to its value. This is slightly more efficient.
 
-### Sender
+## Sender
 
 Set the "Send Targets" addresses in the plugin settings. (Edit/Project Settings/Plugins/OSC)
 
@@ -67,7 +53,7 @@ Build the OSC parameters for a message:
 The "target index" refers to an index in the "Send Targets" array in the settings,
 or to the result of the "Add Send Osc Target" function.
 
-### Inputs (experimental)
+## Inputs (experimental)
 
 List the messages that should be UE4 inputs (like a game controller). A new input is created for each message.
 
@@ -76,20 +62,23 @@ Bind OSC inputs to UE4 action in the usual "Input" project settings.
 
 # General information
 
-### Troubleshooting
+## Known issues
+The plugin currently only supports the UDP protocol.
+
+## Troubleshooting
 
 The plugin uses the standard UE4 logging system.
 
 Check your logs (Window/Developers Tools/Output Log) before asking for help!
 
-### String limitation
+## String limitation
 
 Historically, the plugin handles OSC string using "FName". Unfortunately, the length of
 a "FName" is limited to 1024 characters. So this plugin does not handle long strings correctly.
 
 If you need long strings, prefer using blobs.
 
-### Blob
+## Blob
 
 The OSC protocol supports buffers as "blob".
 
