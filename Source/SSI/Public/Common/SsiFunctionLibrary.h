@@ -40,17 +40,22 @@ public:
      *  @param Address OSC address.
      *  @param Data result of successive PushFloat/Int/String/etc.
      *  @param TargetIndex index of the destination, -1 for all destinations. (SendTarget list of the plugin settings)
+	 *
+	 * sender_name and event_name are unused in the SSI SocketEventReader.
      */
-    UFUNCTION(BlueprintCallable, Category="SSI", meta=(AutoCreateRefTerm = "Data"))
-    static void SendEvent(const FString sender_name, const FString event_name, const TArray<FOscDataElemStruct> & Data, int32 TargetIndex, int32 timestamp = -1, int32 duration = 0, int32 state = 0);
+    UFUNCTION(BlueprintCallable, Category="SSI|Events", meta=(AutoCreateRefTerm = "Data"))
+    static void SendEvent(/*const FString sender_name, const FString event_name, */const TArray<FOscDataElemStruct> & Data, int32 TargetIndex, int32 timestamp = -1, int32 duration = 0, int32 state = 0);
 
-    /**
-    *  @brief Send several OSC messages in an OSC bundle.
-    *  @param Messages of the bundle.
-    *  @param TargetIndex index of the destination, -1 for all destinations. (SendTarget list of the plugin settings)
-    */
-    UFUNCTION(BlueprintCallable, Category="SSI")
-    static void SendOscBundle(const TArray<FOscMessageStruct> & Messages, int32 TargetIndex);
+	/**
+	*  @brief Send an SSI event.
+	*  @param Address OSC address.
+	*  @param Data result of successive PushFloat/Int/String/etc.
+	*  @param TargetIndex index of the destination, -1 for all destinations. (SendTarget list of the plugin settings)
+	*
+	* sender_name and event_name are unused in the SSI SocketEventReader.
+	*/
+	UFUNCTION(BlueprintCallable, Category="SSI|Events", meta = (AutoCreateRefTerm="Data"))
+	static void SendMessage(/*const FString sender_name, const FString event_name, */const FString message, int32 TargetIndex, int32 timestamp = -1, int32 duration = 0);
 
     /**
      *  @brief Add Ip:Port to the available OSC send targets.

@@ -126,7 +126,7 @@ namespace
     TArray<uint8> GlobalBuffer(TArray<uint8>(), 1024);
 }
 
-void USsiFunctionLibrary::SendEvent(const FString sender_name, const FString event_name, const TArray<FOscDataElemStruct> & Data, int32 TargetIndex, int32 timestamp, int32 duration, int32 state)
+void USsiFunctionLibrary::SendEvent(/*const FString sender_name, const FString event_name, */const TArray<FOscDataElemStruct> & Data, int32 TargetIndex, int32 timestamp, int32 duration, int32 state)
 {
     static_assert(sizeof(uint8) == sizeof(char), "Cannot cast uint8 to char");
 
@@ -142,8 +142,8 @@ void USsiFunctionLibrary::SendEvent(const FString sender_name, const FString eve
     check(reinterpret_cast<const void *>(GlobalBuffer.GetData()) == reinterpret_cast<const void *>(output.Data()));
 
 	output << osc::BeginMessage("/evnt");
-	output << TCHAR_TO_ANSI(*sender_name);
-	output << TCHAR_TO_ANSI(*event_name);
+	output << ""; // TCHAR_TO_ANSI(*sender_name); // Is unused in socket event reader
+	output << ""; // TCHAR_TO_ANSI(*event_name); // Is unused in socket event reader
 	output << timestamp;
 	output << duration;
 	output << state;
@@ -178,7 +178,7 @@ void USsiFunctionLibrary::SendEvent(const FString sender_name, const FString eve
     if(output.State() == osc::OUT_OF_BUFFER_MEMORY_ERROR)
     {
         GlobalBuffer.Reserve(GlobalBuffer.Max() * 2);  // not enough memory: double the size
-        SendEvent(sender_name, event_name, Data, TargetIndex);  // try again
+        SendEvent(/*sender_name, event_name, */Data, TargetIndex, timestamp, duration, state);  // try again
         return;
     }
 
@@ -188,56 +188,46 @@ void USsiFunctionLibrary::SendEvent(const FString sender_name, const FString eve
     }
     else
     {
-        UE_LOG(LogSSI, Error, TEXT("OSC Send Message Error: %s"), osc::errorString(output.State()));
+        UE_LOG(LogSSI, Error, TEXT("SSI Send Event Error: %s"), osc::errorString(output.State()));
     }
 }
 
-void USsiFunctionLibrary::SendOscBundle(const TArray<FOscMessageStruct> & Messages, int32 TargetIndex)
+void USsiFunctionLibrary::SendMessage(/*const FString sender_name, const FString event_name, */const FString message, int32 TargetIndex, int32 timestamp, int32 duration)
 {
-    static_assert(sizeof(uint8) == sizeof(char), "Cannot cast uint8 to char");
+	static_assert(sizeof(uint8) == sizeof(char), "Cannot cast uint8 to char");
 
-    osc::OutboundPacketStream output((char *)GlobalBuffer.GetData(), GlobalBuffer.Max());
-    check(reinterpret_cast<const void *>(GlobalBuffer.GetData()) == reinterpret_cast<const void *>(output.Data()));
+	osc::OutboundPacketStream output((char *)GlobalBuffer.GetData(), GlobalBuffer.Max());
+	check(reinterpret_cast<const void *>(GlobalBuffer.GetData()) == reinterpret_cast<const void *>(output.Data()));
 
-    output << osc::BeginBundle();
-    for(const auto & message : Messages)
-    {
-        if(!isValidAddress(message.Address))
-        {
-            return;
-        }
+	output << osc::BeginMessage("/text");
+	output << ""; // TCHAR_TO_ANSI(*sender_name); // Is unused in socket event reader
+	output << ""; // TCHAR_TO_ANSI(*event_name); // Is unused in socket event reader
+	output << timestamp;
+	output << duration;
+	output << TCHAR_TO_ANSI(*message);
 
-        appendMessage(output, message.Address, message.Data);
+	output << osc::EndMessage;
 
-        if(output.State() == osc::OUT_OF_BUFFER_MEMORY_ERROR)
-        {
-            GlobalBuffer.Reserve(GlobalBuffer.Max() * 2);  // not enough memory: double the size
-            SendOscBundle(Messages, TargetIndex);  // try again
-            return;
-        }
-        if(output.State() != osc::SUCCESS)
-        {
-            UE_LOG(LogSSI, Error, TEXT("OSC Send Bundle Error: %s"), osc::errorString(output.State()));
-            return;
-        }
-    }
-    output << osc::EndBundle;
+	if (output.State() != osc::SUCCESS)
+	{
+		return;
+	}
 
-    if(output.State() == osc::OUT_OF_BUFFER_MEMORY_ERROR)
-    {
-        GlobalBuffer.Reserve(GlobalBuffer.Max() * 2);  // not enough memory: double the size
-        SendOscBundle(Messages, TargetIndex);  // try again
-        return;
-    }
+	if (output.State() == osc::OUT_OF_BUFFER_MEMORY_ERROR)
+	{
+		GlobalBuffer.Reserve(GlobalBuffer.Max() * 2);  // not enough memory: double the size
+		SendMessage(/*sender_name, event_name, */message, TargetIndex, timestamp, duration);  // try again
+		return;
+	}
 
-    if(output.State() == osc::SUCCESS)
-    {
-        GetMutableDefault<USsiSettings>()->Send(GlobalBuffer.GetData(), output.Size(), TargetIndex);
-    }
-    else
-    {
-        UE_LOG(LogSSI, Error, TEXT("OSC Send Bundle Error: %s"), osc::errorString(output.State()));
-    }
+	if (output.State() == osc::SUCCESS)
+	{
+		GetMutableDefault<USsiSettings>()->Send(GlobalBuffer.GetData(), output.Size(), TargetIndex);
+	}
+	else
+	{
+		UE_LOG(LogSSI, Error, TEXT("SSI Send Message Error: %s"), osc::errorString(output.State()));
+	}
 }
 
 int32 USsiFunctionLibrary::AddSendOscTarget(FString IpPort)
