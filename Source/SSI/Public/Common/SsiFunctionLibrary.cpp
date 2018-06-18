@@ -2,6 +2,7 @@
 #include "SsiSettings.h"
 #include "SsiFunctionLibrary.h"
 #include "oscpack/osc/OscOutboundPacketStream.h"
+#include <vector>
 
 void USsiFunctionLibrary::StreamPushBool(const TArray<FOscDataElemStruct> & input, bool Value, TArray<FOscDataElemStruct> & output)
 {
@@ -260,8 +261,7 @@ void USsiFunctionLibrary::SendSamples(const TArray<FOscDataElemStruct> & data, i
 		return;
 	}
 
-	uint32 const blob_size = num * dimension * bytes;
-	void* const blob_data = reinterpret_cast<void*>(new BYTE[blob_size]);
+	std::vector<BYTE> blob_data(num * dimension * bytes);
 	
 	int32 idxWrongElementType = -1;
 	for (int i = 0; i < data.Num() && idxWrongElementType < 0; ++i)
@@ -277,7 +277,7 @@ void USsiFunctionLibrary::SendSamples(const TArray<FOscDataElemStruct> & data, i
 					idxWrongElementType = i;
 					break;
 				}
-				float* const dst = reinterpret_cast<float* const>(blob_data) + i;
+				float* const dst = reinterpret_cast<float* const>(blob_data.data()) + i;
 				*dst = (float)elem.AsFloatValue();
 				break;
 			}
@@ -292,17 +292,15 @@ void USsiFunctionLibrary::SendSamples(const TArray<FOscDataElemStruct> & data, i
 	if (idxWrongElementType >= 0)
 	{
 		UE_LOG(LogSSI, Error, TEXT("All elements were expected to be %s but %d-th element wasn't."), *GetStreamSampletypeEnumAsString(type).ToString(), idxWrongElementType);
-		delete[] blob_data;
 		return;
 	}
 
-	UE_LOG(LogSSI, Error, TEXT("Sending blob of size %d"), blob_size);
-	output << osc::Blob(blob_data, blob_size);
+	UE_LOG(LogSSI, Error, TEXT("Sending blob of size %d"), blob_data.size());
+	output << osc::Blob(blob_data.data(), blob_data.size());
 	output << osc::EndMessage;
 
 	if (output.State() != osc::SUCCESS)
 	{
-		delete[] blob_data;
 		return;
 	}
 
@@ -310,7 +308,6 @@ void USsiFunctionLibrary::SendSamples(const TArray<FOscDataElemStruct> & data, i
 	{
 		GlobalBuffer.Reserve(GlobalBuffer.Max() * 2);  // not enough memory: double the size
 		SendSamples(data, TargetIndex, id, timestamp, samplerate, num, dimension, bytes, type);  // try again
-		delete[] blob_data;
 		return;
 	}
 
@@ -322,8 +319,6 @@ void USsiFunctionLibrary::SendSamples(const TArray<FOscDataElemStruct> & data, i
 	{
 		UE_LOG(LogSSI, Error, TEXT("SSI Send Message Error: %s"), osc::errorString(output.State()));
 	}
-
-	delete[] blob_data;
 }
 
 int32 USsiFunctionLibrary::AddSendOscTarget(FString IpPort)
