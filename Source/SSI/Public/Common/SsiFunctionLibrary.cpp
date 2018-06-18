@@ -124,6 +124,14 @@ namespace
     }
 
     TArray<uint8> GlobalBuffer(TArray<uint8>(), 1024);
+
+	FName GetStreamSampletypeEnumAsString(EStreamSampletype EnumValue)
+	{
+		const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EStreamSampletype"), true);
+		if (!EnumPtr) return FName("Invalid");
+
+		return EnumPtr->GetNameByValue((int64)EnumValue); // for EnumValue == VE_Dance returns "VE_Dance"
+	}
 }
 
 void USsiFunctionLibrary::SendEvent(/*const FString sender_name, const FString event_name, */const TArray<FOscDataElemStruct> & Data, int32 TargetIndex, int32 timestamp, int32 duration, int32 state)
@@ -228,6 +236,94 @@ void USsiFunctionLibrary::SendMessage(/*const FString sender_name, const FString
 	{
 		UE_LOG(LogSSI, Error, TEXT("SSI Send Message Error: %s"), osc::errorString(output.State()));
 	}
+}
+
+void USsiFunctionLibrary::SendSamples(const TArray<FOscDataElemStruct> & data, int32 TargetIndex, FString id, int32 timestamp, float samplerate, int32 num, int32 dimension, int32 bytes, EStreamSampletype type)
+{
+	static_assert(sizeof(uint8) == sizeof(char), "Cannot cast uint8 to char");
+
+	osc::OutboundPacketStream output((char *)GlobalBuffer.GetData(), GlobalBuffer.Max());
+	check(reinterpret_cast<const void *>(GlobalBuffer.GetData()) == reinterpret_cast<const void *>(output.Data()));
+
+	output << osc::BeginMessage("/strm");
+	output << TCHAR_TO_ANSI(*id);
+	output << timestamp;
+	output << samplerate;
+	output << num;
+	output << dimension;
+	output << bytes;
+	output << (int8)type;
+
+	if (data.Num() != num * dimension)
+	{
+		UE_LOG(LogSSI, Error, TEXT("Number of elements (%d) doesn't match num * dimension (%d * %d)"), data.Num(), num, dimension);
+		return;
+	}
+
+	uint32 const blob_size = num * dimension * bytes;
+	void* const blob_data = reinterpret_cast<void*>(new BYTE[blob_size]);
+	
+	int32 idxWrongElementType = -1;
+	for (int i = 0; i < data.Num() && idxWrongElementType < 0; ++i)
+	{
+		const FOscDataElemStruct & elem = data[i];
+
+		switch (type)
+		{
+			case EStreamSampletype::FLOAT:
+			{
+				if (!elem.IsFloat())
+				{
+					idxWrongElementType = i;
+					break;
+				}
+				float* const dst = reinterpret_cast<float* const>(blob_data) + i;
+				*dst = (float)elem.AsFloatValue();
+				break;
+			}
+			default:
+			{
+				UE_LOG(LogSSI, Error, TEXT("Sample type %s not supported, yet."), *GetStreamSampletypeEnumAsString(type).ToString());
+				return;
+			}
+		}
+	}
+
+	if (idxWrongElementType >= 0)
+	{
+		UE_LOG(LogSSI, Error, TEXT("All elements were expected to be %s but %d-th element wasn't."), *GetStreamSampletypeEnumAsString(type).ToString(), idxWrongElementType);
+		delete[] blob_data;
+		return;
+	}
+
+	UE_LOG(LogSSI, Error, TEXT("Sending blob of size %d"), blob_size);
+	output << osc::Blob(blob_data, blob_size);
+	output << osc::EndMessage;
+
+	if (output.State() != osc::SUCCESS)
+	{
+		delete[] blob_data;
+		return;
+	}
+
+	if (output.State() == osc::OUT_OF_BUFFER_MEMORY_ERROR)
+	{
+		GlobalBuffer.Reserve(GlobalBuffer.Max() * 2);  // not enough memory: double the size
+		SendSamples(data, TargetIndex, id, timestamp, samplerate, num, dimension, bytes, type);  // try again
+		delete[] blob_data;
+		return;
+	}
+
+	if (output.State() == osc::SUCCESS)
+	{
+		GetMutableDefault<USsiSettings>()->Send(GlobalBuffer.GetData(), output.Size(), TargetIndex);
+	}
+	else
+	{
+		UE_LOG(LogSSI, Error, TEXT("SSI Send Message Error: %s"), osc::errorString(output.State()));
+	}
+
+	delete[] blob_data;
 }
 
 int32 USsiFunctionLibrary::AddSendOscTarget(FString IpPort)

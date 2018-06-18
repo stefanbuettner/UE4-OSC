@@ -4,6 +4,25 @@
 #include "OscMessageStruct.h"
 #include "SsiFunctionLibrary.generated.h"
 
+UENUM(BlueprintType)
+enum class EStreamSampletype : uint8
+{
+	UNDEF = 0,
+	CHAR = 1,
+	UCHAR = 2,
+	SHORT = 3,
+	USHORT = 4,
+	INT = 5,
+	UINT = 6,
+	LONG = 7,
+	ULONG = 8,
+	FLOAT = 9,
+	DOUBLE = 10,
+	LDOUBLE = 11,
+	STRUCT = 12,
+	IMAGE = 13,
+	BOOL = 14,
+};
 
 UCLASS()
 class SSI_API USsiFunctionLibrary : public UBlueprintFunctionLibrary
@@ -56,6 +75,23 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category="SSI|Events", meta = (AutoCreateRefTerm="Data"))
 	static void SendMessage(/*const FString sender_name, const FString event_name, */const FString message, int32 TargetIndex, int32 timestamp = -1, int32 duration = 0);
+
+	/**
+	*  @brief Sends a batch of stream samples.
+	*  @param data
+	*  @param TargetIndex index of the destination, -1 for all destinations. (SendTarget list of the plugin settings)
+	*  @param id
+	*  @param timestamp
+	*  @param samplerate	Sample rate in Hz.
+	*  @param num			The sample count in this batch.
+	*  @param dimension		Number of dimensions per sample. E.g. for a position in 3D space this would be 3.
+	*  @param bytes			Bytes per dimension. E.g. if the 3D position would be stored as floats, this would be 4, because a float is 4 bytes long.
+	*  @param type			All of the dimensions in a sample have to have this type.
+	*
+	* sender_name and event_name are unused in the SSI SocketEventReader.
+	*/
+	UFUNCTION(BlueprintCallable, Category="SSI|Streams", meta=(AutoCreateRefTerm="Data"))
+	static void SendSamples(const TArray<FOscDataElemStruct> & data, int32 TargetIndex, FString id, int32 timestamp, float samplerate, int32 num, int32 dimension, int32 bytes, EStreamSampletype type);
 
     /**
      *  @brief Add Ip:Port to the available OSC send targets.
