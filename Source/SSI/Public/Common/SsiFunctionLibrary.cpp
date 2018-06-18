@@ -295,7 +295,6 @@ void USsiFunctionLibrary::SendSamples(const TArray<FOscDataElemStruct> & data, i
 		return;
 	}
 
-	UE_LOG(LogSSI, Error, TEXT("Sending blob of size %d"), blob_data.size());
 	output << osc::Blob(blob_data.data(), blob_data.size());
 	output << osc::EndMessage;
 
