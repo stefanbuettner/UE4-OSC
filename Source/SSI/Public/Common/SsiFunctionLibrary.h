@@ -24,6 +24,8 @@ enum class EStreamSampletype : uint8
 	BOOL = 14,
 };
 
+int32 GetStreamSampletypeSize(EStreamSampletype type);
+
 UCLASS()
 class SSI_API USsiFunctionLibrary : public UBlueprintFunctionLibrary
 {
@@ -78,9 +80,10 @@ public:
 
 	/**
 	*  @brief Sends a batch of stream samples.
+	*
 	*  @param data
 	*  @param TargetIndex index of the destination, -1 for all destinations. (SendTarget list of the plugin settings)
-	*  @param id
+	*  @param stream_name	A string identifier for the stream.
 	*  @param timestamp
 	*  @param samplerate	Sample rate in Hz.
 	*  @param num			The sample count in this batch.
@@ -88,10 +91,28 @@ public:
 	*  @param bytes			Bytes per dimension. E.g. if the 3D position would be stored as floats, this would be 4, because a float is 4 bytes long.
 	*  @param type			All of the dimensions in a sample have to have this type.
 	*
-	* sender_name and event_name are unused in the SSI SocketEventReader.
+	*  @note Infers the SSI parameters bytes, dimension and type from the data array and the num parameter.
+	*/
+	UFUNCTION(BlueprintCallable, Category="SSI|Streams", meta=(AutoCreateRefTerm = "Data"))
+	static void SendSamples(FString stream_name, const TArray<FOscDataElemStruct> & data, int32 TargetIndex, int32 timestamp, float samplerate, int32 num);
+
+	/**
+	*  @brief Sends a batch of stream samples.
+	*
+	*  @param data
+	*  @param TargetIndex index of the destination, -1 for all destinations. (SendTarget list of the plugin settings)
+	*  @param stream_name	A string identifier for the stream.
+	*  @param timestamp
+	*  @param samplerate	Sample rate in Hz.
+	*  @param num			The sample count in this batch.
+	*  @param dimension		Number of dimensions per sample. E.g. for a position in 3D space this would be 3.
+	*  @param bytes			Bytes per dimension. E.g. if the 3D position would be stored as floats, this would be 4, because a float is 4 bytes long.
+	*  @param type			All of the dimensions in a sample have to have this type.
+	*
+	*  With this method, the sample type, dimension and sample size can be specified explicitly. This allows to send more complex structures as streams.
 	*/
 	UFUNCTION(BlueprintCallable, Category="SSI|Streams", meta=(AutoCreateRefTerm="Data"))
-	static void SendSamples(const TArray<FOscDataElemStruct> & data, int32 TargetIndex, FString id, int32 timestamp, float samplerate, int32 num, int32 dimension, int32 bytes, EStreamSampletype type);
+	static void SendSamplesEx(FString stream_name, const TArray<FOscDataElemStruct> & data, int32 TargetIndex, int32 timestamp, float samplerate, int32 num, int32 dimension, int32 bytes, EStreamSampletype type);
 
     /**
      *  @brief Add Ip:Port to the available OSC send targets.

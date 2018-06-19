@@ -239,21 +239,41 @@ void USsiFunctionLibrary::SendMessage(/*const FString sender_name, const FString
 	}
 }
 
-void USsiFunctionLibrary::SendSamples(const TArray<FOscDataElemStruct> & data, int32 TargetIndex, FString id, int32 timestamp, float samplerate, int32 num, int32 dimension, int32 bytes, EStreamSampletype type)
+void USsiFunctionLibrary::SendSamples(FString stream_name, const TArray<FOscDataElemStruct> & data, int32 TargetIndex, int32 timestamp, float samplerate, int32 num)
+{
+	int32 const dimension = data.Num() / num;
+	if (dimension * num != data.Num())
+	{
+		UE_LOG(LogSSI, Error, TEXT("Not all samples in data have the same dimension."));
+		return;
+	}
+
+	EStreamSampletype type = EStreamSampletype::UNDEF;
+	if (data[0].IsBool()) type = EStreamSampletype::BOOL;
+	else if (data[0].IsFloat()) type = EStreamSampletype::FLOAT;
+	else if (data[0].IsInt()) type = EStreamSampletype::INT;
+	else
+	{
+		UE_LOG(LogSSI, Error, TEXT("Cannot infer type from data array. Please use SendSamplesEx."));
+		return;
+	}
+
+	int32 const bytes = GetStreamSampletypeSize(type);
+	if (bytes <= 0)
+	{
+		UE_LOG(LogSSI, Error, TEXT("GetStreamSampletypeSize returned %d. Developers, please check if it handles all types."));
+		return;
+	}
+
+	SendSamplesEx(stream_name, data, TargetIndex, timestamp, samplerate, num, dimension, bytes, type);
+}
+
+void USsiFunctionLibrary::SendSamplesEx(FString stream_name, const TArray<FOscDataElemStruct> & data, int32 TargetIndex, int32 timestamp, float samplerate, int32 num, int32 dimension, int32 bytes, EStreamSampletype type)
 {
 	static_assert(sizeof(uint8) == sizeof(char), "Cannot cast uint8 to char");
 
 	osc::OutboundPacketStream output((char *)GlobalBuffer.GetData(), GlobalBuffer.Max());
 	check(reinterpret_cast<const void *>(GlobalBuffer.GetData()) == reinterpret_cast<const void *>(output.Data()));
-
-	output << osc::BeginMessage("/strm");
-	output << TCHAR_TO_ANSI(*id);
-	output << timestamp;
-	output << samplerate;
-	output << num;
-	output << dimension;
-	output << bytes;
-	output << (int8)type;
 
 	if (data.Num() != num * dimension)
 	{
@@ -295,6 +315,14 @@ void USsiFunctionLibrary::SendSamples(const TArray<FOscDataElemStruct> & data, i
 		return;
 	}
 
+	output << osc::BeginMessage("/strm");
+	output << TCHAR_TO_ANSI(*stream_name);
+	output << timestamp;
+	output << samplerate;
+	output << num;
+	output << dimension;
+	output << bytes;
+	output << (int8)type;
 	output << osc::Blob(blob_data.data(), blob_data.size());
 	output << osc::EndMessage;
 
@@ -306,7 +334,7 @@ void USsiFunctionLibrary::SendSamples(const TArray<FOscDataElemStruct> & data, i
 	if (output.State() == osc::OUT_OF_BUFFER_MEMORY_ERROR)
 	{
 		GlobalBuffer.Reserve(GlobalBuffer.Max() * 2);  // not enough memory: double the size
-		SendSamples(data, TargetIndex, id, timestamp, samplerate, num, dimension, bytes, type);  // try again
+		SendSamplesEx(stream_name, data, TargetIndex, timestamp, samplerate, num, dimension, bytes, type);  // try again
 		return;
 	}
 
@@ -323,4 +351,24 @@ void USsiFunctionLibrary::SendSamples(const TArray<FOscDataElemStruct> & data, i
 int32 USsiFunctionLibrary::AddSendOscTarget(FString IpPort)
 {
     return GetMutableDefault<USsiSettings>()->GetOrAddSendTarget(IpPort);
+}
+
+int32 GetStreamSampletypeSize(EStreamSampletype type)
+{
+	switch (type)
+	{
+	case EStreamSampletype::CHAR: return sizeof(CHAR);
+	case EStreamSampletype::UCHAR: return sizeof(UCHAR);
+	case EStreamSampletype::SHORT: return sizeof(SHORT);
+	case EStreamSampletype::USHORT: return sizeof(USHORT);
+	case EStreamSampletype::INT: return sizeof(INT);
+	case EStreamSampletype::UINT: return sizeof(UINT);
+	case EStreamSampletype::LONG: return sizeof(LONG);
+	case EStreamSampletype::ULONG: return sizeof(ULONG);
+	case EStreamSampletype::FLOAT: return sizeof(float);
+	case EStreamSampletype::DOUBLE: return sizeof(double);
+	case EStreamSampletype::LDOUBLE: return sizeof(long double);
+	case EStreamSampletype::BOOL: return sizeof(bool);
+	default: return 0;
+	}
 }
