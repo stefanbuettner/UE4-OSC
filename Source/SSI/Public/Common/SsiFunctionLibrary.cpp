@@ -241,6 +241,19 @@ void USsiFunctionLibrary::SendMessage(/*const FString sender_name, const FString
 
 void USsiFunctionLibrary::SendSamples(FString stream_name, const TArray<FOscDataElemStruct> & data, int32 TargetIndex, int32 timestamp, float samplerate, int32 num)
 {
+	if (num <= 0)
+	{
+		UE_LOG(LogSSI, Error, TEXT("The specified number of samples is not positive but %d."), num);
+		return;
+	}
+
+	// All the other parameters are checked in SendSamplesEx.
+
+	if (data.Num() <= 0)
+	{
+		return;
+	}
+
 	int32 const dimension = data.Num() / num;
 	if (dimension * num != data.Num())
 	{
@@ -272,14 +285,43 @@ void USsiFunctionLibrary::SendSamplesEx(FString stream_name, const TArray<FOscDa
 {
 	static_assert(sizeof(uint8) == sizeof(char), "Cannot cast uint8 to char");
 
-	osc::OutboundPacketStream output((char *)GlobalBuffer.GetData(), GlobalBuffer.Max());
-	check(reinterpret_cast<const void *>(GlobalBuffer.GetData()) == reinterpret_cast<const void *>(output.Data()));
+	if (TargetIndex < 0)
+	{
+		UE_LOG(LogSSI, Error, TEXT("The given TargetIndex %d should be non-negative."), TargetIndex);
+		return;
+	}
+
+	if (num <= 0)
+	{
+		UE_LOG(LogSSI, Error, TEXT("The specified number of samples is not positive but %d."), num);
+		return;
+	}
+
+	if (dimension <= 0)
+	{
+		UE_LOG(LogSSI, Error, TEXT("The specified sample dimension is not positive but %d."), dimension);
+		return;
+	}
+
+	if (bytes <= 0)
+	{
+		UE_LOG(LogSSI, Error, TEXT("The specified number of bytes is not positive but %d."), bytes);
+		return;
+	}
+
+	if (data.Num() <= 0)
+	{
+		return;
+	}
 
 	if (data.Num() != num * dimension)
 	{
 		UE_LOG(LogSSI, Error, TEXT("Number of elements (%d) doesn't match num * dimension (%d * %d)"), data.Num(), num, dimension);
 		return;
 	}
+
+	osc::OutboundPacketStream output((char *)GlobalBuffer.GetData(), GlobalBuffer.Max());
+	check(reinterpret_cast<const void *>(GlobalBuffer.GetData()) == reinterpret_cast<const void *>(output.Data()));
 
 	std::vector<BYTE> blob_data(num * dimension * bytes);
 	
