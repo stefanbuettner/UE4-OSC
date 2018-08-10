@@ -49,13 +49,13 @@ namespace UnrealBuildTool.Rules
 
             if (Target.Type == TargetRules.TargetType.Editor)
             {
-                Definitions.Add("SSI_EDITOR_BUILD=1");
+                PublicDefinitions.Add("SSI_EDITOR_BUILD=1");
 
                 PrivateDependencyModuleNames.Add("UnrealEd");
             }
             else
             {
-                Definitions.Add("SSI_EDITOR_BUILD=0");
+                PublicDefinitions.Add("SSI_EDITOR_BUILD=0");
             }
         }
 	}

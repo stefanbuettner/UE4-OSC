@@ -6,7 +6,7 @@
 #endif
 
 
-#define LOCTEXT_NAMESPACE "FOscModule"
+#define LOCTEXT_NAMESPACE "FSsiModule"
 
 
 class FSsiModule : public IModuleInterface

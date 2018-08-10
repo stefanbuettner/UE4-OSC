@@ -20,8 +20,6 @@ void USsiSettings::InitSendTargets()
 {
     UE_LOG(LogSSI, Display, TEXT("Send targets cleared"));
 
-    FString addressStr, portStr;
-
     _sendAddresses.Empty();
     _sendAddresses.Reserve(SendTargets.Num());
 
