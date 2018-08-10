@@ -1,3 +1,5 @@
+0.4: Can SendEvents and SendSamples via the OSC protocol using udp.
+Branch UE4-OSC plugin into UE4-SSI plugin
 0.3: [breaking] parameters are stored as a standard array, allowing use of blueprint array functions, as well a Push/Pop functions
 0.2: add receiver actor class
 0.1: receiver component, send function, float integer boolean and string parameters
