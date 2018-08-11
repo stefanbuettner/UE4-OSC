@@ -3,6 +3,8 @@ UE4-SSI
 
 SSI plugin for Unreal Engine 4 to send and receive SSI events and streams with blueprints!
 
+SSI is a framework for social signal interpretation (hence SSI) from the University of Augsburg. More information at https://hcm-lab.de/projects/ssi/.
+
 It uses oscpack, a C++ library for packing/unpacking OSC messages, by Ross Bencina. http://www.rossbencina.com/code/oscpack
 
 
