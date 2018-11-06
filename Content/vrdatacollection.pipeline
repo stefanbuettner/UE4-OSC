@@ -1,52 +1,98 @@
 <?xml version="1.0" ?>
+<!--
+	Example UE4 pipeline.
+	
+	This pipeline contains templates for recieving
+	 o Events
+	 o Locations
+	 o Rotations
+	 o Transformations
+	 o Values (e.g. FPS)
+
+	from the SSI plugin for the Unreal Engine 4.
+-->
 <pipeline ssi-v="1">
 	
 	<register>
 		<load name="ssiioput"/>
 		<load name="ssigraphic" />
-		<load name="ssiplux" />
 		<load name="ssieventTimeWarp" />
 	</register>
+	
 
+	<!--
+		EVENTS
+	-->
+	<!--object create="SocketEventReader" osc="true" url="udp://127.0.0.1:26150" address="event@foobar" />
+	<object create="FileEventWriter" path="events">
+		<listen address="@"/>
+	</object-->
+
+
+
+	<!--
+		LOCATION
+	-->
 	<!-- OSC sensor. format=2 is OSC. stype=9 is float. -->
-	<sensor create="SocketReader" format="2" url="udp://127.0.0.1:26151" sdim="3" stype="9" sbyte="4" ssr="20">
+	<!--sensor create="SocketReader" format="2" url="udp://127.0.0.1:26151" sdim="3" stype="9" sbyte="4" ssr="25">
 		<output channel="socket" pin="location"/>
 	</sensor>
+	<consumer create="FileWriter:location" type="1" path="somelocation" stream="true" delim=";">
+		<input pin="location" frame="20" />
+	</consumer-->
+	<!--consumer create="SignalPainter:plotlocation" title="location" size="10" type="2">
+		<input pin="location" frame="20"/>
+	</consumer-->
 	
-	<sensor create="SocketReader" format="2" url="udp://127.0.0.1:26152" sdim="3" stype="9" sbyte="4" ssr="10">
-		<output channel="socket" pin="oculus"/>
+
+
+	<!--
+		ROTATION
+	-->
+	<!--sensor create="SocketReader" format="2" url="udp://127.0.0.1:26151" sdim="4" stype="9" sbyte="4" ssr="25">
+		<output channel="socket" pin="rotation"/>
 	</sensor>
-
-	<!-- OSC sensor. format=2 is OSC. stype=9 is float. -->
-	<object create="SocketEventReader" osc="true" url="udp://127.0.0.1:26150" address="event@vr" />
-
-	<sensor create="PluxReader" devicemac="00:07:80:3B:46:57">
-		<output channel="pluxreader" pin="plux"/>
-	</sensor>
-
-	<!-- visualization -->
-	<!--consumer create="SignalPainter:plot" title="X-Pos" size="10" type="2">
-		<input pin="location" frame="0.02s"/>
+	<consumer create="FileWriter:rotation" type="1" path="somerotation" stream="true" delim=";">
+		<input pin="rotation" frame="20" />
+	</consumer-->
+	<!--consumer create="SignalPainter:plotrotation" title="rotation" size="10" type="2">
+		<input pin="rotation" frame="20"/>
 	</consumer-->
 
-	<consumer create="FileWriter:carlocationwriter" type="1" path="carlocation" stream="true" delim=";">
-		<input pin="location" frame="20" /> <!-- frame=integer means write every integer sample -->
-	</consumer>
 
-	<consumer create="FileWriter:vrcamwriter" type="1" path="oculus" stream="true" delim=";">
-		<input pin="oculus" frame="20" /> <!-- frame=integer means write every integer sample -->
-	</consumer>
 
-	<object create="FileEventWriter" path="regionevents">
-		<listen address="@"/>
-	</object>
+	<!--
+		TRANSFORMATIONS
+	-->
+	<!--sensor create="SocketReader" format="2" url="udp://127.0.0.1:26151" sdim="7" stype="9" sbyte="4" ssr="25">
+		<output channel="socket" pin="transform"/>
+	</sensor-->
+	<!--consumer create="FileWriter:transform" type="1" path="sometransform" stream="true" delim=";">
+		<input pin="transform" frame="20" />
+	</consumer-->
+	<!--consumer create="SignalPainter:plottransform" title="transform" size="10" type="2">
+		<input pin="transform" frame="20"/>
+	</consumer-->
 
-	<consumer create="FileWriter" path="plux" type="1">
-		<input pin="plux" frame="50"/>
-	</consumer>
+
+
+	<!--
+		VALUES
+	-->
+	<!--sensor create="SocketReader" format="2" url="udp://127.0.0.1:26152" sdim="1" stype="9" sbyte="4" ssr="25">
+		<output channel="socket" pin="fps"/>
+	</sensor-->
+	<!--consumer create="FileWriter:fps" type="1" path="fps" stream="true" delim=";">
+		<input pin="fps" frame="20" />
+	</consumer-->
+	<!--consumer create="SignalPainter:plotfps" title="fps" size="10" type="2">
+		<input pin="fps" frame="20"/>
+	</consumer-->
+
+
 
 	<!-- decoration -->
-	<object create="Decorator" icon="true" title="Pipeline">
+	<object create="Decorator" icon="true" title="UE4-SSI">
 		<area pos="0,0,400,600">console</area>
 		<area pos="400,0,400,600">plot*</area>		
 	</object>
