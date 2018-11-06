@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<pipeline ssi-v="1">
+	
+	<register>
+		<load name="ssiioput"/>
+		<load name="ssigraphic" />
+		<load name="ssiplux" />
+		<load name="ssieventTimeWarp" />
+	</register>
+
+	<!-- OSC sensor. format=2 is OSC. stype=9 is float. -->
+	<sensor create="SocketReader" format="2" url="udp://127.0.0.1:26151" sdim="3" stype="9" sbyte="4" ssr="20">
+		<output channel="socket" pin="location"/>
+	</sensor>
+	
+	<sensor create="SocketReader" format="2" url="udp://127.0.0.1:26152" sdim="3" stype="9" sbyte="4" ssr="10">
+		<output channel="socket" pin="oculus"/>
+	</sensor>
+
+	<!-- OSC sensor. format=2 is OSC. stype=9 is float. -->
+	<object create="SocketEventReader" osc="true" url="udp://127.0.0.1:26150" address="event@vr" />
+
+	<sensor create="PluxReader" devicemac="00:07:80:3B:46:57">
+		<output channel="pluxreader" pin="plux"/>
+	</sensor>
+
+	<!-- visualization -->
+	<!--consumer create="SignalPainter:plot" title="X-Pos" size="10" type="2">
+		<input pin="location" frame="0.02s"/>
+	</consumer-->
+
+	<consumer create="FileWriter:carlocationwriter" type="1" path="carlocation" stream="true" delim=";">
+		<input pin="location" frame="20" /> <!-- frame=integer means write every integer sample -->
+	</consumer>
+
+	<consumer create="FileWriter:vrcamwriter" type="1" path="oculus" stream="true" delim=";">
+		<input pin="oculus" frame="20" /> <!-- frame=integer means write every integer sample -->
+	</consumer>
+
+	<object create="FileEventWriter" path="regionevents">
+		<listen address="@"/>
+	</object>
+
+	<consumer create="FileWriter" path="plux" type="1">
+		<input pin="plux" frame="50"/>
+	</consumer>
+
+	<!-- decoration -->
+	<object create="Decorator" icon="true" title="Pipeline">
+		<area pos="0,0,400,600">console</area>
+		<area pos="400,0,400,600">plot*</area>		
+	</object>
+
+</pipeline>
