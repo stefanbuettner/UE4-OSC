@@ -24,18 +24,18 @@ Alternatively, right-clic the "*.uproject" to generate Visual Studio or XCode pr
 
 # Usage
 
-## Receiver
+## Streams
 
-Set the listening port as "Receive From" in the plugin settings. (Edit/Project Settings/Plugins/SSI)
+Streams are logged via the components tick methods. The logging frequency can be set via the component's TickInterval.
 
-Add a OscReceiverComponent to your Blueprint class and bind the OnOscReceived custom event, or
-subclass the OscReceiverActor and bind the OnOscReceived custom event.
+### Location
+The location p = (x, y, z) is send to SSI as the 3 consecutive float values x, y, and z representing the logger's world location in euclidean coordinates.
 
-The OnOscReceived event gives: the OSC address, the OSC parameters and the IP of the sender.
+### Rotation
+The rotation q = (x, y, z, w) is send to SSI as the 4 consecutive float values x, y, z, and w representing the logger's rotation as a quaternion in world space.
 
-The OSC parameters is an array of OSC elements. To read the content, either:
- - chain PopFloat/Int/Bool/String/Blob functions to get the first value, or
- - use the standard GET function and AsFloat/Int/Bool/String/Blob functions to cast the element to its value. This is slightly more efficient.
+### Transform
+The unscaled transform of an object is send to SSI as a concatenation of the object's location and rotation (x, y, z, qx, qy, qz, qw).
 
 ## Sender
 
@@ -89,6 +89,6 @@ This plugin implements them as "Array<uint8>". It plays nicely with the "Extende
 
 # Engine version
 
-Get the right branch for your engine version: "master" for the latest version, "before4.8" for 4.4, ..., 4.7, etc.
+The current version of the plugin was developed with the Unreal Engine version 4.19.2.
 
 If the plugin does not work/build for the current version, feel free to create an issue or email me!
