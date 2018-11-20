@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace UnrealBuildTool.Rules
 {
 	public class SSI : ModuleRules
@@ -31,19 +33,15 @@ namespace UnrealBuildTool.Rules
 
             PublicIncludePaths.AddRange(
 				new string[] {
-					"SSI/Public",
-					"SSI/Public/Common",
-					"SSI/Public/Receive",
-					"SSI/Public/Send",
+					Path.Combine(ModuleDirectory, "Public"),
+					Path.Combine(ModuleDirectory, "Public/Common"),
 				}
             );
 
 			PrivateIncludePaths.AddRange(
 				new string[] {
-					"SSI/Private",
-					"SSI/Private/Common",
-					"SSI/Private/Receive",
-					"SSI/Private/Send",
+					Path.Combine(ModuleDirectory, "Private"),
+					Path.Combine(ModuleDirectory, "Private/Common"),
 				}
 			);
 
