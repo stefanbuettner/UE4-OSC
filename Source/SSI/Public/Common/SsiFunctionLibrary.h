@@ -126,4 +126,7 @@ public:
      */
     UFUNCTION(BlueprintCallable, Category="SSI")
     static int32 AddSendOscTarget(FString IpPort = "127.0.0.1:8000");
+
+	UFUNCTION(BlueprintPure, Category = "SSI|Math")
+	static void RotatorToQuat(FRotator const R, FQuat& quaternion);
 };

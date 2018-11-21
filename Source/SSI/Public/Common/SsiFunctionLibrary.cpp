@@ -414,3 +414,8 @@ int32 GetStreamSampletypeSize(EStreamSampletype type)
 	default: return 0;
 	}
 }
+
+void USsiFunctionLibrary::RotatorToQuat(FRotator const R, FQuat& quaternion)
+{
+	quaternion = R.Quaternion();
+}
